@@ -9,43 +9,42 @@ class User(Base):
     id = mapped_column(Integer, primary_key=True)
     username = mapped_column(String(25), unique=True, nullable=False)
     password = mapped_column(String(128), nullable=False)
-    
-    def checkPassword(password):
-        upperChars, lowerChars, specialChars, digits, length = 0, 0, 0, 0, 0
-        length = len(password)
-        
-        if (length < 8):
-            print("Password must be at least 8 characters long!\n")
-        else:
-            for i in range(0, length):
-                if(password[i].isUpper()):
-                    upperChars += 1
-                elif(password[i].isLower()):
-                    lowerChars += 1
-                elif(password[i].isdigit()):
-                    digits +=1
-                else:
-                    specialChars +=1
-                    
-        if (upperChars != 0 and lowerChars != 0 and digits != 0 and specialChars != 0):
-            if (length >= 10):
-                print("The strength of password is strong.\n")
+
+    def __repr__(self):
+        return f"<User(id={self.id}, username='{self.username}')>"
+
+    def check_password_strength(self, password):
+        upperChars, lowerChars, specialChars, digits, length = 0, 0, 0, 0, len(password)
+
+        if length < 8:
+            return "Password must be at least 8 characters long!"
+
+        for char in password:
+            if char.isupper():
+                upperChars += 1
+            elif char.islower():
+                lowerChars += 1
+            elif char.isdigit():
+                digits += 1
             else:
-                print("The strength of password is medium.\n")
+                specialChars += 1
+                
+        if upperChars > 0 and lowerChars > 0 and digits > 0 and specialChars > 0:
+            return "The strength of password is strong." if length >= 10 else "The strength of password is medium."
         else:
-            if (upperChars == 0):
-                print("Password must contain at least one uppercase character!\n")
-            if (lowerChars == 0):
-                print("Password must contain at least one lowercase character!\n")
-            if (specialChars == 0):
-                print("Password must contain at least one special character!\n")
-            if (digits == 0):
-                print("Password must contain at least one digit!\n")
+            messages = []
+            if upperChars == 0:
+                messages.append("Password must contain at least one uppercase character!")
+            if lowerChars == 0:
+                messages.append("Password must contain at least one lowercase character!")
+            if specialChars == 0:
+                messages.append("Password must contain at least one special character!")
+            if digits == 0:
+                messages.append("Password must contain at least one digit!")
+            return " ".join(messages)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-    
+        self.password = generate_password_hash(password)
+
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-    
-    
+        return check_password_hash(self.password, password)
