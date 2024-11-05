@@ -1,7 +1,7 @@
 from sqlalchemy.orm import mapped_column
 from sqlalchemy import Integer, String
 from werkzeug.security import generate_password_hash, check_password_hash
-from database import Base
+from models import Base
 
 class User(Base):
     __tablename__ = "users"
