@@ -1,15 +1,15 @@
 # Database URI Secret Keys
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from sqlalchemy import create_engine
+
 
 app = Flask(__name__)
 app.secret_key = "Sapatoes"
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  
 
-db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
 
 # if __name__ == "__main__":
 #     with app.app_context():
