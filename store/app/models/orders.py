@@ -9,7 +9,7 @@ class Order(Base):
     user_id = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
     sneaker_id = mapped_column('Integer', ForeignKey('sneakers.id'), nullable=False)
     quantity = mapped_column(Integer, nullable=False, default=1)
-    order_date = mapped_column(DateTime, default=DateTime.utcnow)
+    order_date = mapped_column(DateTime)
     total_price = mapped_column(Float, nullable=False)
     
     user = relationship("User", back_populates="orders")
