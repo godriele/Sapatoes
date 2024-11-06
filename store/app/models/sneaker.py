@@ -1,4 +1,4 @@
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy import String, Integer, Float, DateTime
 from models import Base
 
@@ -19,3 +19,5 @@ class Sneaker(Base):
     description = mapped_column(String)
     image_url = mapped_column(String)
     sizes = mapped_column(String)
+    
+    orders = relationship("Orders", back_populates="sneaker")
