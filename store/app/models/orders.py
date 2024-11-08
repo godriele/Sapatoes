@@ -11,6 +11,7 @@ class Order(Base):
     quantity = mapped_column(Integer, nullable=False, default=1)
     order_date = mapped_column(DateTime)
     total_price = mapped_column(Float, nullable=False)
+    order_summary = mapped_column(String, nullable=False)
     
     user = relationship("User", back_populates="orders")
     sneaker = relationship("Sneaker", back_populates="orders")

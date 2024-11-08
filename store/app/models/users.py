@@ -1,4 +1,4 @@
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy import Integer, String
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import Base
@@ -10,8 +10,7 @@ class User(Base):
     username = mapped_column(String(25), unique=True, nullable=False)
     password = mapped_column(String(128), nullable=False)
 
-    def __repr__(self):
-        return f"<User(id={self.id}, username='{self.username}')>"
+    orders = relationship("Order", back_populates="users",)
 
     def check_password_strength(self, password):
         upperChars, lowerChars, specialChars, digits, length = 0, 0, 0, 0, len(password)
