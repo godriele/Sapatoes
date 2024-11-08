@@ -1,0 +1,17 @@
+{
+  "name": "sapatoes-2",
+  "version": "1.0.0",
+  "description": "Sneaker Website",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "sneaks-api": "^1.2.3"
+  }
+}

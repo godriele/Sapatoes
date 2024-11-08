@@ -1,6 +1,22 @@
 import jwt  # Importing the PyJWT library to handle JWT encoding and decoding
 import datetime  # Importing datetime for handling the token expiration time
 
+'''
+# * What is JWT
+
+A JSON Web Token (JWT) is a compact and self-contained way to securely transmit information 
+between parties as a JSON object. It is commonly used for authentication and authorization in
+web applications and APIs.
+
+Key Features of JWT:
+Compact and URL-safe: JWTs are encoded and can be easily transmitted via URLs, HTTP headers, or 
+within cookies.
+Self-contained: JWTs contain all the information needed about the user (or other entities) in the 
+token itself, eliminating the need to query a database each time you need the user's information.
+Secure: JWTs are typically signed using a secret key (HS256) or a public/private key pair (RS256), 
+which ensures their authenticity and integrity.
+
+'''
 # JWT configuration constants
 JWT_SECRET_KEY = "sapatoes"  # Replace this with a strong secret key (for signing the JWT securely)
 JWT_ALGORITHM = "HS256"  # HS256 is a widely used algorithm for signing JWTs
@@ -79,6 +95,5 @@ Summary of jwt.py
     Decodes and verifies a JWT.
     Checks the token’s expiration and validates the signature using the secret key and algorithm.
     If the token is expired or invalid, raises an appropriate exception (ExpiredSignatureError or InvalidTokenError).
-
 
 '''
