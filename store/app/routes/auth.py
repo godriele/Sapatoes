@@ -1,51 +1,53 @@
-from flask import Flask, request, session, redirect, url_for, render_template
+# auth.py
+from flask import Flask, request, jsonify, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
-from models.users import User  # Assuming the User model is imported here
+from models.users import User  # Assuming the User model is imported here (modify as necessary)
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
+import jwt  # Import PyJWT for JWT decoding/encoding
+from jwt import create_jwt_token, decode_jwt_token  # Import JWT functions from jwt.py (modify the import if needed)
 
 app = Flask(__name__)
-app.secret_key = "sneaker"  # Required for session to work
 
 # Your SQLite Database URI
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/goody/Library/Mobile Documents/com~apple~CloudDocs/Code/Projects/Sapatoes1/users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = "sneaker"  # For session or other uses; consider securing this better.
 db = SQLAlchemy(app)
 
 # Routes
 @app.route("/")
 def home():
-    if "username" in session:
-        return redirect(url_for('dashboard'))
     return render_template("index.html")
 
 
-# Login
+# Login route: Now using JWT for authentication
 @app.route("/login", methods=["POST"])
 def login():
     username = request.form.get("username")
     password = request.form.get("password")
 
-    # Raw SQL Query with `text()`
+    # Raw SQL Query to find the user's password hash
     result = db.session.execute(
         text("SELECT password_hash FROM user WHERE username = :username"),
         {"username": username}
-    ).fetchone()  # Get the first result, as `username` should be unique
+    ).fetchone()
 
     if result:
         user_password_hash = result[0]  # Fetch the first column (password_hash)
 
         if check_password_hash(user_password_hash, password):
-            session["username"] = username  # Store the username in session
-            return redirect(url_for('dashboard'))  # Redirect to dashboard
+            # Password matched, generate a JWT token
+            token = create_jwt_token(username)
+            return jsonify({"token": token})  # Return the JWT token to the client
         else:
             return render_template("index.html", error="Invalid credentials")
     else:
         return render_template("index.html", error="User not found")
 
 
-# Register
+# Register route: Using raw SQL and password hashing
 @app.route("/register", methods=["POST"])
 def register():
     username = request.form.get("username")
@@ -71,19 +73,31 @@ def register():
             )
             db.session.commit()  # Commit the transaction
 
-            session['username'] = username  # Store username in session
-            return redirect(url_for('dashboard'))
+            # After successful registration, generate a JWT token
+            token = create_jwt_token(username)
+            return jsonify({"token": token})  # Return the JWT token to the client
         except SQLAlchemyError as e:
             db.session.rollback()  # Rollback if there’s an error
             return render_template("index.html", error="Error occurred while registering the user. Please try again.")
 
 
-# Dashboard route
+# Dashboard route: Protected by JWT token
 @app.route("/dashboard")
 def dashboard():
-    if "username" not in session:
-        return redirect(url_for("home"))
-    return render_template("dashboard.html", username=session["username"])
+    token = request.headers.get("Authorization")  # Expect the token to be in the Authorization header
+
+    if token:
+        try:
+            # Decode and validate the JWT token
+            payload = decode_jwt_token(token)
+            username = payload["username"]  # Retrieve the username from the payload
+            return render_template("dashboard.html", username=username)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("home", error="Session expired, please log in again"))
+        except jwt.InvalidTokenError:
+            return redirect(url_for("home", error="Invalid token, please log in again"))
+    else:
+        return redirect(url_for("home", error="Token required, please log in first"))
 
 
 if __name__ == "__main__":
